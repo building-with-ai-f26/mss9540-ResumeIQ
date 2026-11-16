@@ -2,11 +2,11 @@
 
 **Apply Easier.** Optimize your experience for every role without the hassle.
 
-ResumeIQ is here to ensure your resume accurately reflects your experience for every job. Upload a PDF or Word `.docx` resume, or paste text, then add a specific job description to review strengths, missing evidence, and three suggested improvements. The primary user for PRD v1 is an NYU Stern MBA student recruiting for product management.
+Applying to jobs has never been more stressful. Each job needing a personally tailored resume, it can take up a lot more time than you might have! ResumeIQ is here to help. It ensures your resume accurately reflects your experience for every job. Upload a PDF or Word `.docx` resume, or paste text, then add a specific job description to review strengths, missing evidence, and three suggested improvements. The primary user for PRD v1 is an NYU Stern MBA student recruiting. 
 
-Build 1 due November 9, 2026 at noon, New York time. [PRD and build log](docs/index.html).
+ [PRD and build log](docs/index.html).
 
-**Repository status:** The builder successfully generated a live AI review using the fictional example. The November 12 screenshot and documentation updates are prepared locally for review; they have not been committed or pushed. Public deployment remains unverified. The private `.env` and virtual environment are excluded.
+**Repository status:** The builder successfully generated a live AI review using the fictional example. T Public deployment remains unverified.
 
 ## Run locally
 
