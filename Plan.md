@@ -7,7 +7,7 @@ Build 1 scope approved: local paste-and-review app, server-side OpenRouter first
 - `server.py`: Python 3.8+ HTTP server; loads environment, serves explicit UI routes, validates input, calls OpenRouter, validates result shape. Binds to 127.0.0.1 only.
 - `app/`: plain HTML/CSS/JavaScript. Output uses textContent.
 - `docs/`: static Product Page and actual screenshot for GitHub Pages.
-- One PDF library (pypdf); standard-library DOCX parsing; no database, login, saved resume history, or Build 1 analytics.
+- One PDF library (pypdf); standard-library DOCX parsing; no database, login, or saved resume history. Build 2 adds optional PostHog analytics on both pages.
 - Default model: `openai/gpt-4o-mini`, overridable with `OPENROUTER_MODEL`. The builder’s November 12 fictional-example review succeeded, as captured in `docs/assets/ai-review.png`. Systematic model quality remains unverified.
 
 ## Risk and verification
@@ -33,3 +33,25 @@ Coding-agent subscription: approximately $20/month (builder estimate), shared wi
 ## Approved upload extension
 
 PDF and .docx upload → `/api/extract` → editable resume text → existing analysis workflow. Files stay in memory. Limits: 5 MB, 20 PDF pages, 20,000 extracted characters. Errors preserve existing text. No OCR or legacy .doc support. Use a virtual environment and `requirements.txt`; see README. Ten tests passed, including PDF/DOCX extraction and upload-to-analysis HTTP checks. Complex document reading order and real-user documents still need manual review.
+
+## Build 2 analytics update · November 14, 2026
+
+Implemented a shared, optional PostHog setup for the Product Page and local app. The public configuration is blank pending the builder's project token and ingestion host. Two explicit local asset routes serve only the shared scripts. Tracking includes pageviews and predefined click actions, with a surface property to separate the two pages. Replay is enabled in client configuration but also requires the project's recording setting.
+
+Privacy: document inputs, file selection, results, and dynamic status are blocked from replay; all inputs are masked. Custom events contain only predefined action names. Network payload/header, performance, exception, and console recording are disabled. No paid API call is needed for analytics verification.
+
+Verification: mocked JavaScript SDK checks passed for both surfaces, JavaScript syntax and Git whitespace checks passed. Live ingestion and actual replay masking remain pending project configuration and dashboard inspection. No new spending, builder hours, or user feedback has been reported for this update. Do not claim this completes PRD v2 or the two-day Build 2 commit requirement.
+
+## Optional LinkedIn evidence extension
+
+Builder-approved: add a profile PDF upload and editable text field, without profile URL retrieval. Reuse in-memory PDF extraction, preserve the resume and job-description requirements, and send optional LinkedIn text separately in AI mode. Validate a new `linkedin_opportunities` array (0–5 non-empty strings) only when profile text is supplied. Keep exactly three improvements and the original resume-only response shape. Non-AI results explicitly state that LinkedIn comparison requires AI.
+
+The prompt requests short LinkedIn evidence, relevance to the job, and experience absent from the resume. Schema checks do not verify factual accuracy or semantic duplication. All 15 Python tests passed, including mocked LinkedIn requests, PDF-to-mocked-analysis, invalid input, empty opportunities, and the existing resume-only workflow. Node checks exercise UI behavior and analytics privacy settings. No new live model request, costs, hours, or outside feedback is claimed. Existing cost estimates cover the original short example; additional profile text increases input usage.
+
+## PostHog configuration · November 15, 2026
+
+The builder supplied the browser project token and `https://us.i.posthog.com` ingestion host. Both are now in the shared public configuration. No personal API key or OpenRouter credential is exposed by this change. A live Chrome check loaded the SDK on the local app and reported capture was not opted out, but recording was inactive. Dashboard verification and publication of the current Product Page changes remain pending. Enable project session recording before verifying replay.
+
+## PostHog delivery diagnosis · November 15, 2026
+
+The existing app process on port 8000 served the updated HTML but returned 404 for `/analytics.js` and `/posthog-config.js`, indicating that the server needed restarting to load the new asset routes. A temporary server running current code loaded PostHog on both the local app and Product Page preview. Session recording was active. With PostHog's bot filter overridden only inside the temporary automated test browser, labeled test events and replay requests both received HTTP 200 responses (`/i/v0/e/` and `/s/`). The production bot-filter setting was unchanged. These are delivery checks, not outside-user evidence or confirmation of dashboard rendering and replay privacy. Normal-server restart, dashboard inspection, and public-page deployment remain pending.

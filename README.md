@@ -40,11 +40,28 @@ Set `OPENROUTER_API_KEY` to your actual key. Optionally set `OPENROUTER_MODEL` (
 
 Choose **AI analysis · OpenRouter**, load the fictional example, and analyze. A successful response is the actual connection check. The configuration indicator only checks for a non-placeholder key; credits, model availability, and networking may still prevent a review. Errors are displayed without silently substituting non-AI output.
 
-AI mode sends both texts from the Python server to OpenRouter and its model provider. Remove personal details. This app has no database and does not save or log inputs; provider retention policies still apply. Credentials never go to the browser. The server is for local development only.
+AI mode sends the resume, job description, and any supplied LinkedIn text from the Python server to OpenRouter and its model provider. Remove personal details. This app has no database and does not save or log inputs; provider retention policies still apply. Credentials never go to the browser. The server is for local development only.
 
 ### Non-AI demo
 
 Choose **Non-AI keyword comparison**, load the fictional example, and analyze. Literal shared/absent keywords and three generic prompts appear. This cannot interpret synonyms, assess qualifications, or establish resume quality. It calls no external API.
+
+## PostHog analytics (Build 2)
+
+Both the Product Page and local app use `docs/assets/analytics.js` and `docs/assets/posthog-config.js`. Analytics stays off while the configuration is blank. The builder supplied the public project token and US ingestion host on November 15. These are configured locally; the Product Page needs publishing before its public version uses them. Live dashboard verification remains pending.
+
+1. Create or select your PostHog project. Copy its **public project token** (usually `phc_...`) and ingestion host from Web setup into `docs/assets/posthog-config.js`. Supported hosts are `https://us.i.posthog.com` and `https://eu.i.posthog.com`. The project token is intended for browser use; never use a personal API key or OpenRouter credential.
+2. Enable **Record user sessions** in the project's session replay settings. Keep network payload/header and console recording disabled. For a fictional verification session, use 100% sampling and no restrictive URL/event triggers or minimum-duration filter; revisit these settings after verification.
+3. Restart the local server after updating `server.py`, then refresh the local app. Publish the reviewed files to verify the Product Page on GitHub Pages. Local changes alone do not update the public page.
+4. On each surface, stay for at least 20 seconds, scroll, and click a tracked control. In the app, load the fictional example and analyze; a non-AI run is sufficient to verify analytics without additional inference spending.
+5. In PostHog, find `$pageview` and `ui_clicked`, filtered by `surface` (`product_page` or `local_app`). Click properties contain only a predefined `action`: `load_example`, `analyze_resume`, `choose_file`, `see_prototype`, `read_prd`, or `read_build_log`.
+6. Play each recording. Confirm scrolling and clicks are visible while document inputs, selected files, dynamic status, and generated results are blocked. Check event properties for accidental document content. Use fictional data throughout; record screenshots and verification outcomes only after seeing actual events and replay.
+
+Autocapture is disabled in favor of explicit click events. Replay blocks sensitive app elements and masks all inputs; network bodies/headers, performance capture, exception capture, and console recording are disabled in the client configuration. The SDK still collects standard browser/session metadata and uses browser storage; the page and app disclose analytics. An unavailable or blocked SDK does not prevent the app from running. Ad blockers may prevent delivery.
+
+Checks: `node tests/test_analytics.js` uses a mocked SDK to verify pageview/click behavior, disabled configuration, and privacy settings. Python HTTP tests check the explicit analytics routes and rejected private-file paths. These checks do not establish live PostHog ingestion or actual replay masking; dashboard verification is still required.
+
+References: [PostHog JavaScript installation](https://posthog.com/docs/libraries/js), [replay privacy controls](https://posthog.com/docs/session-replay/privacy), and [network capture controls](https://posthog.com/docs/session-replay/network-recording).
 
 ## Upload a resume
 
@@ -55,6 +72,16 @@ Scanned/image-only PDFs need OCR first. Password-protected PDFs and older `.doc`
 After initial installation, start with `.venv/bin/python server.py`. Restart any previously running server to load the new upload endpoint.
 
 Upload verification: ten automated tests passed, including real generated PDF/DOCX extraction, DOCX tables, invalid/encrypted/empty-text/oversized document rejection, and HTTP upload-to-non-AI-analysis for both formats. Tests use fictional generated documents, not user resumes. Try your own PDF and Word document and inspect the extracted text before the demo.
+
+## Optional LinkedIn experience
+
+Expand **Additional experience from LinkedIn · optional** beneath the two input cards. Upload a text-based LinkedIn profile PDF (5 MB, 20 pages maximum) or paste your About, Experience, and project text. Review the editable preview before analyzing; clear it to leave LinkedIn out. The app does not visit LinkedIn or retrieve profiles from URLs. Existing PDF extraction limits apply; profile text is limited to 20,000 characters.
+
+In AI mode, the supplied profile text is sent with the resume and job description to OpenRouter. An additional result section asks for job-relevant LinkedIn evidence missing from the resume, with short supporting quotes and suggested truthful additions. It can report no additional evidence. Profile claims are user-supplied and not independently verified; review the comparison before making edits. Non-AI mode compares only the resume and job description and clearly labels LinkedIn comparison as requiring AI.
+
+**Load fictional example** now also fills an optional fictional LinkedIn example with competitive-analysis experience. The existing November 12 screenshot predates this feature. New LinkedIn comparison behavior is tested with mocked provider responses, not a fresh live model-quality evaluation. Added profile text increases token usage; the earlier per-review cost estimate covers the short original example, not every LinkedIn-assisted review.
+
+The profile PDF is extracted in memory through the existing endpoint. No documents are saved or logged. PostHog blocks the LinkedIn text, file input, upload status, and all results from replay. Custom events contain no profile content. Checks: `node tests/test_app.js`, `node tests/test_analytics.js`, and the Python suite cover the optional input, output validation, safe rendering, upload errors, and backward compatibility. Restart the server and refresh the browser to load this update.
 
 ## Your two-minute demo and manual checks
 

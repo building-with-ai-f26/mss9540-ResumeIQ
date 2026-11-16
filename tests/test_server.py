@@ -45,6 +45,29 @@ class ReviewTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 server.validate_result(result)
 
+    @patch.dict('os.environ', {'OPENROUTER_API_KEY': 'test-only-not-a-real-key'})
+    def test_linkedin_is_separate_untrusted_evidence(self):
+        result = {'strengths': ['Resume evidence'], 'missing_evidence': ['Gap'], 'improvements': ['One', 'Two', 'Three'], 'linkedin_opportunities': ['LinkedIn says competitive research; relevant to the job.']}
+        response = io.BytesIO(json.dumps({'choices': [{'message': {'content': json.dumps(result)}}]}).encode())
+        with patch('urllib.request.urlopen', return_value=response) as request:
+            actual, _ = server.ai_review('resume evidence', 'job requirements', 'LinkedIn competitive research')
+            self.assertEqual(actual['linkedin_opportunities'], result['linkedin_opportunities'])
+            payload = json.loads(request.call_args[0][0].data)
+            supplied = json.loads(payload['messages'][1]['content'])
+            self.assertEqual(supplied['resume'], 'resume evidence')
+            self.assertEqual(supplied['linkedin_text'], 'LinkedIn competitive research')
+            self.assertIn('untrusted data', payload['messages'][0]['content'])
+            self.assertIn('absent from the resume', payload['messages'][0]['content'])
+
+    def test_linkedin_output_can_be_empty_but_must_be_valid(self):
+        base = {'strengths': ['Evidence'], 'missing_evidence': ['Gap'], 'improvements': ['One', 'Two', 'Three']}
+        self.assertEqual(server.validate_result(dict(base, linkedin_opportunities=[]), True)['linkedin_opportunities'], [])
+        for bad in (None, 'invented', [3], [''], ['a'] * 6):
+            with self.assertRaises(ValueError):
+                server.validate_result(dict(base, linkedin_opportunities=bad), True)
+        with self.assertRaises(ValueError):
+            server.validate_result(base, True)
+
 
 if __name__ == '__main__':
     unittest.main()

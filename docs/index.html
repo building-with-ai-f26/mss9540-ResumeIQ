@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Apply Easier. · ResumeIQ</title>
 
-  <!-- Week 1: create your PostHog account only.
-       Build 2: paste your project's current PostHog web snippet here,
-       then install analytics in the local app and verify events. -->
+  <script src="assets/posthog-config.js" defer></script>
+  <script src="assets/analytics.js" defer></script>
 
   <style>
     :root {
@@ -140,14 +139,14 @@
     }
   </style>
 </head>
-<body>
+<body data-analytics-surface="product_page">
   <main class="container">
     <header>
-      <span class="eyebrow">NYU Stern · Software Engineering with AI · Build 1</span>
+      <span class="eyebrow">NYU Stern · Software Engineering with AI · Build 2</span>
       <h1>Apply Easier.</h1>
       <p class="tagline">Optimize your experience for every role without the hassle.</p>
       <p>ResumeIQ is here to ensure your resume accurately reflects your experience for every job.</p>
-      <div class="cta-row"><a class="btn" href="#live-demo">See the prototype</a><a class="btn btn-secondary" href="#prd">Read PRD v1</a><a class="btn btn-secondary" href="#build-log">Build log</a></div>
+      <div class="cta-row"><a class="btn" href="#live-demo" data-analytics-action="see_prototype">See the prototype</a><a class="btn btn-secondary" href="#prd" data-analytics-action="read_prd">Read PRD v2</a><a class="btn btn-secondary" href="#build-log" data-analytics-action="read_build_log">Build log</a></div>
     </header>
     <section id="live-demo">
       <h2>Local prototype</h2>
@@ -157,21 +156,26 @@
       <p>Install dependencies using the setup instructions, run <code>.venv/bin/python server.py</code> in the repository, then open <code>http://127.0.0.1:8000</code>. <a href="https://github.com/building-with-ai-f26/mss9540-projectTBD#readme">Setup and demo instructions</a>.</p>
     </section>
     <section id="prd">
-      <h2>PRD v1 · November 8, 2026</h2>
+      <h2>PRD v2 · November 15, 2026</h2>
       <h3>Primary user and reach</h3>
       <p>An NYU Stern MBA student recruiting for product management positions who has a resume and a specific job posting. Planned outreach: invite a Stern MBA classmate directly through the builder’s school network to try one application. No participant has been confirmed and no user feedback has been collected.</p>
       <h3>The job to be done</h3>
       <p><strong>Before:</strong> The student manually compares a job posting with their resume, guesses which experiences matter, and rewrites bullets without a clear priority. This is the initial problem hypothesis, not a measured research finding.</p>
-      <p><strong>After:</strong> In one sitting, paste both texts, request a review, read strengths and missing evidence, and use three suggested improvements to make truthful edits. The student reviews and edits their own resume.</p>
+      <p><strong>After:</strong> In one sitting, provide a resume and job description, optionally add LinkedIn profile text or a profile PDF, request a review, and use the evidence and three suggested improvements to make truthful edits. The student reviews and edits their own resume.</p>
       <h3>One core workflow</h3>
-      <p>Upload a PDF/Word .docx resume or paste text → paste a specific job description → analyze → review strengths, missing evidence, and exactly three suggested improvements.</p>
+      <p>Upload a PDF/Word .docx resume or paste text → paste a specific job description → optionally add LinkedIn profile text/PDF → analyze → review strengths, missing resume evidence, exactly three suggested improvements, and any additional relevant LinkedIn evidence.</p>
       <p>AI is the intended review mode. The local fallback reports literal keyword overlap and generic editing prompts; it cannot evaluate qualifications, synonyms, or resume quality. Missing evidence never establishes that a candidate lacks a skill.</p>
-      <h3>Three non-goals for Build 1</h3>
+      <h3>Build 2 boundaries</h3>
       <ul><li>General job-title analysis without a specific job description: a possible later feature.</li><li>Resume template design, formatting, or export.</li><li>Job searching, application submission, or applicant tracking integrations.</li></ul>
       <h3>Simple architecture and main risk</h3>
-      <p>Resume upload or pasted text → local Python server → OpenRouter/model provider → validated result → browser. The key stays on the server. No database or saved resume history. In non-AI mode, the Python server performs a local keyword comparison without sending documents to an external service.</p>
-      <p><strong>Main risk:</strong> A model may misread evidence or suggest unsupported claims. The prompt requests grounded observations and truthful edits; the server checks output shape and exactly three improvements. These checks do not establish analysis quality. Live model testing and a target-user review remain necessary.</p>
-      <p><strong>Privacy:</strong> AI mode sends both input texts to OpenRouter and its provider; their retention policies apply. Remove personal details. This app does not persist inputs or log request contents. Browser form state remains until cleared or closed.</p>
+      <p>The browser sends PDF/.docx uploads to <code>/api/extract</code>; Python extracts text in memory into an editable preview. On Analyze, the browser sends the resume, job description, and optional LinkedIn text to <code>/api/analyze</code>. Python validates the inputs, calls OpenRouter, validates the response shape, and returns the result for safe rendering with <code>textContent</code>. The key stays on the server. No database or saved resume history. In non-AI mode, the Python server performs a local keyword comparison without sending documents to an external service.</p>
+      <p><strong>Biggest risk:</strong> Advice may encourage unsupported resume claims or incorrectly present experience already in the resume as new LinkedIn evidence. The prompt requests source-specific evidence and truthful additions; the user confirms claims before editing. Schema checks verify structure, not truth or semantic accuracy.</p>
+      <h3>How Build 2 tests that risk</h3>
+      <p><strong>Completed:</strong> Fifteen deterministic Python tests cover document extraction, input validation, mocked provider success/failure, exactly three improvements, separate LinkedIn inputs, and valid or empty LinkedIn opportunity arrays. Mocked browser checks verify safe text rendering and prevent stale LinkedIn results. The November 12 real AI screenshot demonstrates connectivity, while the builder’s November 15 PostHog screenshots demonstrate local pageviews, clicks, and replay arrival.</p>
+      <p><strong>Next live check:</strong> Compare fictional resume-only and LinkedIn-assisted reviews. Include one job-relevant fact found only in the profile, one fact already paraphrased in the resume, and an instruction embedded in the profile. Check that suggestions cite supplied evidence, identify the new relevant fact without duplicating existing experience, ignore embedded instructions, and retain exactly three truthful improvements. Record failures and actual outputs; these live checks and an outside target-user review are still pending. Analytics can reveal workflow friction but cannot establish advice quality.</p>
+      <h3>Cost per run</h3>
+      <p>The earlier estimate for a short fictional-example GPT-4o mini review is $0.0003–$0.0007, not a measured bill. Using the previously documented rates, estimated inference cost is (input tokens × $0.15 + output tokens × $0.60) ÷ 1,000,000, excluding credit-purchase fees. Optional LinkedIn text adds input tokens and may increase output length, so this short-example range is not a fixed price for LinkedIn-assisted reviews. Actual usage costs come from OpenRouter Activity; local non-AI comparisons make no paid inference call.</p>
+      <p><strong>Privacy:</strong> AI mode sends the resume, job description, and any supplied LinkedIn text to OpenRouter and its provider; their retention policies apply. Remove personal details. This app does not persist inputs or log request contents. Browser form state remains until cleared or closed.</p>
     </section>
     <section id="build-log">
       <h2>Build 1 log · November 8, 2026</h2>
@@ -188,6 +192,30 @@
         <li><strong>Hours:</strong> Approximately 3 hours (builder-reported estimate).</li>
       </ul>
       <p><strong>Next:</strong> Assess sample output quality, invite a Stern MBA PM candidate, record actual API usage and coding-agent costs, and keep this page updated. Build 2 planning will address output quality and analytics. Build 4 evaluation track remains undecided.</p>
+    </section>
+    <section id="linkedin-update">
+      <h2>Optional LinkedIn experience</h2>
+      <p>The local app now accepts a LinkedIn profile PDF or pasted profile text alongside the resume and job description. In AI mode, an additional result section identifies job-relevant evidence supplied on LinkedIn but missing from the resume, citing short supporting excerpts. Users must confirm each claim. The app analyzes supplied text only; it does not open LinkedIn profiles or independently verify experience. Non-AI mode does not compare LinkedIn.</p>
+      <p><strong>Build progress and lesson:</strong> Reused in-memory PDF extraction and added a separate optional input rather than merging profile claims into resume evidence. LinkedIn inputs and all generated results are blocked from PostHog replay. Fifteen Python tests passed, and mocked JavaScript checks cover submission, safe rendering, uploads, and analytics settings. No live LinkedIn comparison or new screenshot has been captured; semantic quality remains unverified. The earlier per-review cost estimate covers the original short example; profile text adds token usage. Build 2 hours and payment updates are recorded below.</p>
+    </section>
+    <section id="analytics-status">
+      <h2>Build 2 · Analytics verification</h2>
+      <p>PostHog is configured for the Product Page and local app. On November 15, the builder supplied dashboard screenshots showing a Pageview and <code>ui_clicked</code> events from <code>http://127.0.0.1:8000/</code>, plus a real local ResumeIQ session in the replay player. Older port-8766 events were labeled automated preview checks and are not outside-user evidence.</p>
+      <p>The local configuration blocks document inputs, file selection, dynamic status, and generated results from replay; custom click events include only predefined action names. After playing back the fictional review, the builder confirmed that resume text, LinkedIn text, and generated results stayed hidden. This is a builder-reported manual privacy check; it does not establish masking for every possible interaction or future change.</p>
+      <p><strong>Pending:</strong> Publish these changes, then confirm pageviews, clicks, and replay from the public GitHub Pages URL. Automated checks of the local Product Page preview do not establish public-site tracking.</p>
+    </section>
+    <section id="build-2-log">
+      <h2>Build 2 log · November 15, 2026</h2>
+      <p class="meta">Due November 16 at noon, New York time. Current Build 2 changes remain local and uncommitted pending builder review.</p>
+      <ul>
+        <li><strong>Progress:</strong> Added shared PostHog configuration and tracking on both HTML pages, explicit analytics asset routes, optional LinkedIn profile PDF/text input, validated LinkedIn opportunities, and updated setup/structure instructions in AGENTS.md. PRD v2 documents the main risk, test plan, architecture, and estimated cost per run. The real November 12 AI screenshot remains on this page; no new live LinkedIn review is claimed.</li>
+        <li><strong>Checks:</strong> Fifteen Python tests and mocked JavaScript UI/analytics checks passed. Chrome inspection confirmed the updated layout. The builder’s November 15 screenshots confirm local pageviews, click events, and session replay arrival. The builder also reported that resume text, LinkedIn text, and results stayed hidden during replay playback. Public-site tracking remains pending.</li>
+        <li><strong>Problem and diagnosis:</strong> The old server process served updated HTML but returned 404 for the new analytics scripts. Restarting the server loaded the new routes, after which the builder saw events and replay. Automated headless-browser events were filtered as bots; a temporary test-browser override allowed labeled diagnostic events and replay requests, which received HTTP 200 responses. Production bot filtering was unchanged.</li>
+        <li><strong>Lessons from this build:</strong> Changing Python routes requires a server restart even when HTML updates are already visible. Loading an analytics SDK is different from confirming event delivery. PostHog’s public browser token is distinct from private OpenRouter credentials. Replay arrival is different from checking privacy across a complete workflow. LinkedIn profile content must be supplied explicitly and kept distinct from resume evidence.</li>
+        <li><strong>Costs:</strong> Builder reports no additional payments for Build 2. The previously reported coding-agent subscription is approximately $20/month, shared with other uses; ResumeIQ’s portion is unmeasured. The previous $5 OpenRouter credit purchase is prepaid funding, not an additional Build 2 payment or a measured usage bill. No separate PostHog payment was reported. Exact API consumption and cumulative project costs remain unreported; the estimated per-review cost is listed in PRD v2.</li>
+        <li><strong>Hours:</strong> Approximately 3 hours for Build 2 (builder-reported estimate), separate from the approximately 3 hours previously reported for Build 1.</li>
+        <li><strong>Commits:</strong> Build 2 changes have not yet been committed or pushed. Do not infer two-day Build 2 compliance from November 8 and 12 Build 1 commits. Record meaningful commits on actual dates outside class; no backdating or empty evidence commits.</li>
+      </ul>
     </section>
     <footer class="meta">ResumeIQ · Built for NYU Stern · <a href="https://github.com/building-with-ai-f26/mss9540-projectTBD">Repository</a></footer>
   </main>

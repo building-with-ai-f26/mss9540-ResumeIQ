@@ -2,6 +2,7 @@ import io
 import json
 import threading
 import unittest
+from unittest.mock import patch
 import urllib.error
 import urllib.request
 from zipfile import ZipFile
@@ -81,3 +82,40 @@ class UploadHTTPTests(unittest.TestCase):
             urllib.request.urlopen(urllib.request.Request(self.url + '/api/extract', data=b'broken', headers={'X-Filename': 'resume.docx'}))
         self.assertEqual(error.exception.code, 400)
         self.assertIn('Could not read', json.load(error.exception)['error'])
+
+    def test_only_explicit_analytics_assets_are_public(self):
+        for route in ('/analytics.js', '/posthog-config.js'):
+            with urllib.request.urlopen(self.url + route) as response:
+                self.assertEqual(response.status, 200)
+                self.assertIn('javascript', response.headers['Content-Type'])
+                self.assertNotIn(b'sk-or-v1-', response.read())
+        for route in ('/.env', '/docs/assets/../.env', '/server.py'):
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(self.url + route)
+            self.assertEqual(error.exception.code, 404)
+
+    def test_optional_linkedin_validation_and_non_ai_label(self):
+        base = {'resume': TEXT, 'job_description': TEXT, 'mode': 'local'}
+        for invalid in (None, {}, 42, 'x' * 20001):
+            body = json.dumps(dict(base, linkedin_text=invalid)).encode()
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(urllib.request.Request(self.url + '/api/analyze', data=body))
+            self.assertEqual(error.exception.code, 400)
+        with patch('server.ai_review') as provider:
+            body = json.dumps(dict(base, linkedin_text='Additional fictional experience')).encode()
+            with urllib.request.urlopen(urllib.request.Request(self.url + '/api/analyze', data=body)) as response:
+                data = json.load(response)
+            provider.assert_not_called()
+            self.assertIn('LinkedIn comparison requires AI mode', data['label'])
+            self.assertNotIn('linkedin_opportunities', data['result'])
+
+    def test_linkedin_pdf_to_mocked_ai_review(self):
+        with urllib.request.urlopen(urllib.request.Request(self.url + '/api/extract', data=pdf_bytes(), headers={'X-Filename': 'linkedin.pdf'})) as response:
+            profile = json.load(response)['text']
+        result = {'strengths': ['Evidence'], 'missing_evidence': ['Gap'], 'improvements': ['One', 'Two', 'Three'], 'linkedin_opportunities': []}
+        with patch('server.ai_review', return_value=(result, 'mock-model')) as provider:
+            body = json.dumps({'resume': TEXT, 'job_description': TEXT, 'mode': 'ai', 'linkedin_text': profile}).encode()
+            with urllib.request.urlopen(urllib.request.Request(self.url + '/api/analyze', data=body)) as response:
+                data = json.load(response)
+            provider.assert_called_once_with(TEXT, TEXT, profile)
+            self.assertEqual(data['result']['linkedin_opportunities'], [])
