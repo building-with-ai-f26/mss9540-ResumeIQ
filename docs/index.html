@@ -153,7 +153,7 @@
       <p><strong>Status:</strong> The builder successfully generated a real AI review of the fictional example through OpenRouter using GPT-4o mini. The screenshot below captures that result. The local non-AI workflow is also verified. This public page is a showcase, not the running app.</p>
       <figure style="margin:20px 0"><a href="assets/ai-review.png"><img src="assets/ai-review.png" width="2880" height="1800" style="width:100%;height:auto;border:1px solid #d7ded5;border-radius:8px" alt="Successful ResumeIQ AI analysis labeled openai/gpt-4o-mini, showing strengths, missing evidence, and three next moves for the fictional example."></a><figcaption class="meta">Successful live AI review through OpenRouter using openai/gpt-4o-mini, captured by the builder on November 12, 2026. Fictional example inputs; actual model output. Click to view the full-size screenshot. This demonstrates a working API connection, not a completed evaluation of advice quality. Only add claims you can support.</figcaption></figure>
       <figure style="margin:20px 0"><a href="assets/prototype.png?v=purple-layout-749d4e6"><img src="assets/prototype.png?v=purple-layout-749d4e6" width="1440" height="1964" style="width:100%;height:auto;border:1px solid #d7ded5;border-radius:8px" alt="Redesigned purple ResumeIQ prototype with the Apply Easier headline, PDF/Word upload area, fictional resume and job description, and three non-AI result cards."></a><figcaption class="meta">Current local prototype screenshot, November 8, 2026, showing the purple redesign and PDF/Word upload area. Fictional example in explicitly selected Non-AI keyword comparison mode. No AI output or real user data is shown.</figcaption></figure>
-      <p>Install dependencies using the setup instructions, run <code>.venv/bin/python server.py</code> in the repository, then open <code>http://127.0.0.1:8000</code>. <a href="https://github.com/building-with-ai-f26/mss9540-projectTBD#readme">Setup and demo instructions</a>.</p>
+      <p>Install dependencies using the setup instructions, run <code>.venv/bin/python server.py</code> in the repository, then open <code>http://127.0.0.1:8000</code>. <a href="https://github.com/building-with-ai-f26/mss9540-ResumeIQ#readme">Setup and demo instructions</a>.</p>
     </section>
     <section id="prd">
       <h2>PRD v2 · November 15, 2026</h2>
@@ -206,7 +206,7 @@
     </section>
     <section id="build-2-log">
       <h2>Build 2 log · November 15, 2026</h2>
-      <p class="meta">Due November 16 at noon, New York time. Current Build 2 changes remain local and uncommitted pending builder review.</p>
+      <p class="meta">Due November 16 at noon, New York time. Build 2 implementation was committed on November 15 and pushed with the README merge on November 16. Repository links were updated after the rename to mss9540-ResumeIQ; these link corrections await review and publication.</p>
       <ul>
         <li><strong>Progress:</strong> Added shared PostHog configuration and tracking on both HTML pages, explicit analytics asset routes, optional LinkedIn profile PDF/text input, validated LinkedIn opportunities, and updated setup/structure instructions in AGENTS.md. PRD v2 documents the main risk, test plan, architecture, and estimated cost per run. The real November 12 AI screenshot remains on this page; no new live LinkedIn review is claimed.</li>
         <li><strong>Checks:</strong> Fifteen Python tests and mocked JavaScript UI/analytics checks passed. Chrome inspection confirmed the updated layout. The builder’s November 15 screenshots confirm local pageviews, click events, and session replay arrival. The builder also reported that resume text, LinkedIn text, and results stayed hidden during replay playback. Public-site tracking remains pending.</li>
@@ -214,10 +214,10 @@
         <li><strong>Lessons from this build:</strong> Changing Python routes requires a server restart even when HTML updates are already visible. Loading an analytics SDK is different from confirming event delivery. PostHog’s public browser token is distinct from private OpenRouter credentials. Replay arrival is different from checking privacy across a complete workflow. LinkedIn profile content must be supplied explicitly and kept distinct from resume evidence.</li>
         <li><strong>Costs:</strong> Builder reports no additional payments for Build 2. The previously reported coding-agent subscription is approximately $20/month, shared with other uses; ResumeIQ’s portion is unmeasured. The previous $5 OpenRouter credit purchase is prepaid funding, not an additional Build 2 payment or a measured usage bill. No separate PostHog payment was reported. Exact API consumption and cumulative project costs remain unreported; the estimated per-review cost is listed in PRD v2.</li>
         <li><strong>Hours:</strong> Approximately 3 hours for Build 2 (builder-reported estimate), separate from the approximately 3 hours previously reported for Build 1.</li>
-        <li><strong>Commits:</strong> Build 2 changes have not yet been committed or pushed. Do not infer two-day Build 2 compliance from November 8 and 12 Build 1 commits. Record meaningful commits on actual dates outside class; no backdating or empty evidence commits.</li>
+        <li><strong>Commits:</strong> November 14: README update (f6ca18b). November 15: Build 2 analytics, LinkedIn comparison, and PRD v2 (fcd800c). November 16: merged the remote README changes and pushed (b410903). These are actual commit dates; the builder must confirm that the work was outside class. No dates were backdated.</li>
       </ul>
     </section>
-    <footer class="meta">ResumeIQ · Built for NYU Stern · <a href="https://github.com/building-with-ai-f26/mss9540-projectTBD">Repository</a></footer>
+    <footer class="meta">ResumeIQ · Built for NYU Stern · <a href="https://github.com/building-with-ai-f26/mss9540-ResumeIQ">Repository</a></footer>
   </main>
 </body>
 </html>

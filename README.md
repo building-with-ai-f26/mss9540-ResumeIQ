@@ -13,7 +13,7 @@ Applying to jobs has never been more stressful. Each job needing a personally ta
 Python 3.8+ is required. In Terminal, install PDF support into a project virtual environment:
 
 ```bash
-cd /Users/meherseera/Desktop/mss9540-projectTBD
+cd /Users/meherseera/Desktop/mss9540-ResumeIQ
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python server.py
@@ -123,11 +123,11 @@ On GitHub:
 4. Choose **main**, **/docs**, then **Save**.
 5. Wait for deployment; follow GitHub’s published-site link. Verify the PRD, log, and screenshot in a private browser window.
 
-Expected address for this repository: https://building-with-ai-f26.github.io/mss9540-projectTBD/ . Publication has not been verified. GitHub Pages hosts the showcase, not the local Python app.
+Product Page: https://building-with-ai-f26.github.io/mss9540-ResumeIQ/ . The renamed page, AI screenshot, and PostHog script/configuration assets returned HTTP 200 on November 16, 2026. Dashboard verification of events and replay from this public URL remains pending. GitHub Pages hosts the showcase, not the local Python app.
 
 Reference: [GitHub Pages publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
-Submit the published Product Page and [repository URL](https://github.com/building-with-ai-f26/mss9540-projectTBD) in Icerynk. The class template requires meaningful commits on two separate days outside class; do not invent or backdate history.
+Submit the published Product Page and [repository URL](https://github.com/building-with-ai-f26/mss9540-ResumeIQ) in Icerynk. The class template requires meaningful commits on two separate days outside class; do not invent or backdate history.
 
 ## Main files
 
