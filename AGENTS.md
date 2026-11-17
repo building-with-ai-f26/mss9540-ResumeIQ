@@ -43,3 +43,15 @@
 - Users may upload a profile PDF or paste profile text (20,000 characters maximum). No URL fetching, LinkedIn OAuth, or third-party profile provider.
 - Reuse `/api/extract`; never save uploads. AI sends profile text separately as untrusted data and validates an optional `linkedin_opportunities` array. Non-AI mode does not compare LinkedIn.
 - Keep LinkedIn inputs, upload status, and results blocked from PostHog replay; never put their contents in events or logs. Live LinkedIn comparison quality remains unverified.
+
+## Public job-link imports
+- `job_links.py` implements `/api/job-description` using only standard-library HTTP, TLS, DNS validation, and HTML extraction. Imported text stays editable before analysis; failures preserve prior text.
+- Validate every destination and redirect: public IPs only, no credentials or nonstandard ports. Pin connections to the vetted IP while verifying TLS against the original hostname. Never send resume/profile content, cookies, or OpenRouter credentials to job sites.
+- Cap response bytes, extracted characters, redirects, and network timeouts. Do not execute page JavaScript or bypass login/bot protection; tell users to paste inaccessible descriptions.
+- Block job URL/status from PostHog replay and never include URLs or page contents in custom event properties. Security and HTTP tests use mocked remote responses.
+
+## Browser-local saved resumes
+- `app/resumes.js` provides explicit name/text saves and open/rename/delete actions via local storage key `resumeiq.saved-resumes.v1`. No autosave or server persistence; do not store uploaded files, jobs, LinkedIn text, model results, or keys.
+- Keep the whole library, dialogs, and save status blocked from replay. Never add resume names, IDs, text, or saved counts to custom event properties.
+- Handle blocked/quota/corrupt storage without claiming success or overwriting unreadable data. Confirm before replacing different workspace text or deleting a save. Limit saves to 20 with names up to 80 characters and text of 30–20,000 characters.
+- Run `node tests/test_resumes.js` for storage lifecycle/failure checks, plus existing UI/analytics checks. Restart the server after adding the explicit `/resumes.js` route.

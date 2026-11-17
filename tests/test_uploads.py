@@ -84,7 +84,7 @@ class UploadHTTPTests(unittest.TestCase):
         self.assertIn('Could not read', json.load(error.exception)['error'])
 
     def test_only_explicit_analytics_assets_are_public(self):
-        for route in ('/analytics.js', '/posthog-config.js'):
+        for route in ('/analytics.js', '/posthog-config.js', '/resumes.js'):
             with urllib.request.urlopen(self.url + route) as response:
                 self.assertEqual(response.status, 200)
                 self.assertIn('javascript', response.headers['Content-Type'])
@@ -93,6 +93,21 @@ class UploadHTTPTests(unittest.TestCase):
             with self.assertRaises(urllib.error.HTTPError) as error:
                 urllib.request.urlopen(self.url + route)
             self.assertEqual(error.exception.code, 404)
+
+    def test_job_link_endpoint_import_and_validation(self):
+        with patch('server.fetch_job_description', return_value=TEXT) as fetch:
+            body = json.dumps({'url': 'https://example.com/job'}).encode()
+            with urllib.request.urlopen(urllib.request.Request(self.url + '/api/job-description', data=body)) as response:
+                self.assertEqual(json.load(response)['text'], TEXT)
+            fetch.assert_called_once_with('https://example.com/job')
+        for body in (b'[]', b'bad JSON', b''):
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(urllib.request.Request(self.url + '/api/job-description', data=body))
+            self.assertEqual(error.exception.code, 400)
+        request = urllib.request.Request(self.url + '/api/job-description', data=b'{}', headers={'Origin': 'https://untrusted.example'})
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(request)
+        self.assertEqual(error.exception.code, 403)
 
     def test_optional_linkedin_validation_and_non_ai_label(self):
         base = {'resume': TEXT, 'job_description': TEXT, 'mode': 'local'}

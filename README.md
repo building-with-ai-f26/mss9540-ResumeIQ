@@ -23,14 +23,15 @@ Open http://127.0.0.1:8000 . Stop with Ctrl+C. If port 8000 is occupied, check w
 
 ## Current interface
 
-The local prototype uses a purple and lavender palette, a large “Apply Easier.” headline, soft background gradients, and two numbered input cards:
+The local app uses a compact, left-aligned workspace with a minimal sidebar, Helvetica/Arial typography, neutral surfaces, and sparing purple actions. A narrower editor stacks the resume upload above the target-role inputs on desktop and mobile. Resume text expands for pasting or reviewing an upload; loading the fictional example or extracting a resume opens that editor automatically. The sidebar provides Workspace and a working Saved resumes library. No application tracker or export capability is implied.
 
-- **Your experience:** upload a PDF or Word document, or paste resume text. Extracted text appears in an editable preview.
-- **Your next opportunity:** paste the specific job description.
+- **Your resume:** upload PDF/.docx or paste text; extracted text remains editable.
+- **Job description:** paste text or import a public posting URL, then review the preview.
+- **Additional LinkedIn experience:** optionally upload a profile PDF or paste profile text.
 
-Choose a review mode below the cards, then click **Analyze my resume**. Results appear in separate cards for **Strengths**, **Missing evidence**, and **Three next moves**. On smaller screens, the cards stack vertically.
+Select a review mode and choose **Analyze my resume**. Results prioritize **Three improvements**, with separate **Strengths**, **Missing evidence**, and optional LinkedIn evidence. Loading controls, announced status messages, visible keyboard focus, and inline errors provide feedback. Expand **How your information is used** for the existing provider and analytics disclosures.
 
-The redesign changes presentation; the upload and analysis workflow is unchanged. Refresh the browser to load updated HTML and styling. The public Product Page at `docs/index.html` is a separate showcase with its own layout.
+Refresh the browser to load this frontend update; backend behavior and environment configuration are unchanged by the workspace redesign. The GitHub Pages Product Page is a separate showcase. Its older screenshots remain historical evidence of actual runs, not captures of the current workspace.
 
 ### Enable AI
 
@@ -40,7 +41,7 @@ Set `OPENROUTER_API_KEY` to your actual key. Optionally set `OPENROUTER_MODEL` (
 
 Choose **AI analysis · OpenRouter**, load the fictional example, and analyze. A successful response is the actual connection check. The configuration indicator only checks for a non-placeholder key; credits, model availability, and networking may still prevent a review. Errors are displayed without silently substituting non-AI output.
 
-AI mode sends the resume, job description, and any supplied LinkedIn text from the Python server to OpenRouter and its model provider. Remove personal details. This app has no database and does not save or log inputs; provider retention policies still apply. Credentials never go to the browser. The server is for local development only.
+AI mode sends the resume, job description, and any supplied LinkedIn text from the Python server to OpenRouter and its model provider. Remove personal details. This app has no server database and does not log inputs. Resume text is stored in browser local storage only when you explicitly choose Save resume; provider retention policies still apply. Credentials never go to the browser. The server is for local development only.
 
 ### Non-AI demo
 
@@ -73,6 +74,24 @@ After initial installation, start with `.venv/bin/python server.py`. Restart any
 
 Upload verification: ten automated tests passed, including real generated PDF/DOCX extraction, DOCX tables, invalid/encrypted/empty-text/oversized document rejection, and HTTP upload-to-non-AI-analysis for both formats. Tests use fictional generated documents, not user resumes. Try your own PDF and Word document and inspect the extracted text before the demo.
 
+## Saved resumes (browser-local)
+
+Choose **Save resume** below the resume editor, enter a name, and confirm to save the current resume text. **Saved resumes** in the sidebar lets you open, rename, or delete saves. Opening a different resume asks before replacing workspace text; it preserves the current job description and LinkedIn text. Each save is a separate copy, not an automatic update to a previously opened save.
+
+Only the name, resume text, ID, and update date are stored, under `resumeiq.saved-resumes.v1` in this browser's local storage. Up to 20 resumes (30–20,000 characters each) can be saved. No original PDF/DOCX, job description, LinkedIn text, analysis output, or API key is saved. Browser storage is not encrypted or account-protected; people with access to this browser profile can read it. Saves do not sync across devices or browser profiles, and changing the app origin/port uses different storage. Clearing this site's browser data or ending a private session can remove saves. Delete actions remove the saved copy while leaving any text currently open in the workspace.
+
+Storage that is blocked, full, or corrupted shows an error rather than claiming success or automatically overwriting unreadable data. The main review workflow remains available. PostHog excludes the entire saved-resume view, save/rename/delete dialogs, and save feedback from replay; no library content or names are added to custom events. `app/resumes.js` implements the library, served through an explicit `/resumes.js` route. Restart the server to load that route.
+
+Verification: `node tests/test_resumes.js` checks persistence and failure cases with mocked storage. Browser checks use fictional data in an isolated profile. These checks do not establish cross-device sync, secure backup, or private browsing persistence.
+
+## Import a job-posting link
+
+The local app accepts an optional public HTTP/HTTPS job URL. Click **Load job description**, then review and correct the imported text in the existing job-description box before analyzing. Pasting text still works. The URL is used only to retrieve text; it is not sent to OpenRouter or included in custom analytics events, and its input/status are blocked from replay.
+
+The Python server uses standard-library HTTP fetching and text extraction, preferring structured JobPosting descriptions when available. Every destination and redirect must resolve only to public IP addresses on standard HTTP/HTTPS ports; connections use the vetted address with HTTPS hostname/certificate validation. Responses are limited to 2 MB and imported text to 30–20,000 characters. Imports do not execute JavaScript, log in, use browser cookies, or call a paid model. Login walls, bot protection, JavaScript-only pages, PDFs, and unusually large pages may require pasting the job description instead. The posting website receives the fetch request; no resume or LinkedIn text is sent with it. Failed imports preserve existing job text.
+
+Restart the server to load the new `/api/job-description` endpoint. Deterministic security/HTTP tests use mocked external sites; these do not prove compatibility with every job board. The visual refresh uses Helvetica-style typography and the purple brand palette with small amber and blue accents; the existing screenshots show an earlier design.
+
 ## Optional LinkedIn experience
 
 Expand **Additional experience from LinkedIn · optional** beneath the two input cards. Upload a text-based LinkedIn profile PDF (5 MB, 20 pages maximum) or paste your About, Experience, and project text. Review the editable preview before analyzing; clear it to leave LinkedIn out. The app does not visit LinkedIn or retrieve profiles from URLs. Existing PDF extraction limits apply; profile text is limited to 20,000 characters.
@@ -81,7 +100,7 @@ In AI mode, the supplied profile text is sent with the resume and job descriptio
 
 **Load fictional example** now also fills an optional fictional LinkedIn example with competitive-analysis experience. The existing November 12 screenshot predates this feature. New LinkedIn comparison behavior is tested with mocked provider responses, not a fresh live model-quality evaluation. Added profile text increases token usage; the earlier per-review cost estimate covers the short original example, not every LinkedIn-assisted review.
 
-The profile PDF is extracted in memory through the existing endpoint. No documents are saved or logged. PostHog blocks the LinkedIn text, file input, upload status, and all results from replay. Custom events contain no profile content. Checks: `node tests/test_app.js`, `node tests/test_analytics.js`, and the Python suite cover the optional input, output validation, safe rendering, upload errors, and backward compatibility. Restart the server and refresh the browser to load this update.
+The profile PDF is extracted in memory through the existing endpoint. LinkedIn uploads and text are not saved or logged. PostHog blocks the LinkedIn text, file input, upload status, and all results from replay. Custom events contain no profile content. Checks: `node tests/test_app.js`, `node tests/test_analytics.js`, and the Python suite cover the optional input, output validation, safe rendering, upload errors, and backward compatibility. Restart the server and refresh the browser to load this update.
 
 ## Your two-minute demo and manual checks
 
@@ -132,6 +151,7 @@ Submit the published Product Page and [repository URL](https://github.com/buildi
 ## Main files
 
 - `server.py`: server, environment configuration, OpenRouter, validation, keyword fallback.
+- `job_links.py`: public job-page fetching and text extraction.
 - `resume_files.py`: in-memory PDF and Word text extraction; `requirements.txt`: pinned PDF dependency.
 - `app/`: browser interface.
 - `tests/test_server.py`: deterministic behavior and simulated provider tests.

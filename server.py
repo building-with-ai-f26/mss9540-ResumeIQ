@@ -8,6 +8,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from resume_files import extract_resume, MAX_FILE_BYTES
+from job_links import fetch_job_description
 
 ROOT = Path(__file__).resolve().parent
 
@@ -117,17 +118,30 @@ class Handler(BaseHTTPRequestHandler):
         }
         if self.path in analytics_routes:
             return self.send(200, (ROOT / 'docs' / 'assets' / analytics_routes[self.path]).read_bytes(), 'text/javascript; charset=utf-8')
-        routes = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'), '/style.css': ('style.css', 'text/css; charset=utf-8')}
+        routes = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'), '/resumes.js': ('resumes.js', 'text/javascript; charset=utf-8'), '/style.css': ('style.css', 'text/css; charset=utf-8')}
         if self.path not in routes:
             return self.send(404, {'error': 'Not found'})
         name, kind = routes[self.path]
         self.send(200, (ROOT / 'app' / name).read_bytes(), kind)
 
     def do_POST(self):
-        if self.path not in ('/api/analyze', '/api/extract'):
+        if self.path not in ('/api/analyze', '/api/extract', '/api/job-description'):
             return self.send(404, {'error': 'Not found'})
         if self.headers.get('Origin') not in (None, 'http://' + self.headers.get('Host', '')):
             return self.send(403, {'error': 'Cross-origin request rejected'})
+        if self.path == '/api/job-description':
+            try:
+                length = int(self.headers.get('Content-Length', '0'))
+                if not 0 < length <= 16384:
+                    raise ValueError('Enter a public job-posting URL.')
+                data = json.loads(self.rfile.read(length))
+                if not isinstance(data, dict):
+                    raise ValueError('Enter a public job-posting URL.')
+                text = fetch_job_description(data.get('url'))
+                return self.send(200, {'text': text})
+            except (UnicodeError, ValueError) as exc:
+                message = str(exc) if type(exc) is ValueError else 'Enter a public job-posting URL.'
+                return self.send(400, {'error': message})
         if self.path == '/api/extract':
             try:
                 length = int(self.headers.get('Content-Length', '0'))

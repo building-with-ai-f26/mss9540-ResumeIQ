@@ -6,7 +6,7 @@
   if (!/^phc_[a-zA-Z0-9]+$/.test(config.token || '') || !hosts.includes(config.host)) return;
 
   const surface = document.body.dataset.analyticsSurface;
-  const actions = new Set(['load_example', 'analyze_resume', 'choose_file', 'see_prototype', 'read_prd', 'read_build_log']);
+  const actions = new Set(['load_example', 'analyze_resume', 'choose_file', 'see_prototype', 'read_prd', 'read_build_log', 'import_job_link']);
   const sdk = document.createElement('script');
   sdk.src = config.host.replace('.i.posthog.com', '-assets.i.posthog.com') + '/static/array.js';
   sdk.async = true;
@@ -28,7 +28,7 @@
         disable_session_recording: false,
         session_recording: {
           maskAllInputs: true,
-          blockSelector: '#resume, #job, #resume-file, #linkedin-text, #linkedin-file, #linkedin-status, #results, #upload-status, #status, #configuration',
+          blockSelector: '#resume, #save-resume-status, #saved-resumes-view, #resume-name-dialog, #resume-confirm-dialog, #job, #job-url, #job-link-status, #resume-file, #linkedin-text, #linkedin-file, #linkedin-status, #results, #upload-status, #status, #configuration',
           recordBody: false,
           recordHeaders: false,
           recordCanvas: false,

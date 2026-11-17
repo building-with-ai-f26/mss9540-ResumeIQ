@@ -3,55 +3,82 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Apply Easier. · ResumeIQ</title>
+  <title>Workspace · ResumeIQ</title>
   <link rel="stylesheet" href="/style.css">
   <script src="/posthog-config.js" defer></script>
   <script src="/analytics.js" defer></script>
   <script src="/app.js" defer></script>
+  <script src="/resumes.js" defer></script>
 </head>
 <body data-analytics-surface="local_app">
-  <nav class="topbar" aria-label="Brand"><a class="brand" href="/" aria-label="ResumeIQ home"><span class="brand-mark" aria-hidden="true">R<span>✦</span></span>Resume<span class="brand-iq">IQ</span></a><span class="badge"><span class="status-dot" aria-hidden="true"></span>Local prototype</span></nav>
-  <main>
-    <header class="hero">
-      <span class="eyebrow"><span aria-hidden="true">✦</span> YOUR NEXT CHAPTER STARTS HERE</span>
-      <h1>Apply <em>Easier.</em></h1>
-      <p class="intro">Optimize your experience for every role without the hassle.</p>
-      <p class="hero-description">ResumeIQ is here to ensure your resume accurately reflects your experience for every job.</p>
-      <div class="journey" aria-label="How it works"><span><b>1</b>Add your resume</span><span class="journey-line" aria-hidden="true"></span><span><b>2</b>Choose your role</span><span class="journey-line" aria-hidden="true"></span><span><b>3</b>Find your next move</span></div>
-    </header>
-    <form id="review-form">
-      <div class="workspace-heading"><div><span class="eyebrow">THE WORKSPACE</span><h2>Make your experience count.</h2></div><button id="sample" data-analytics-action="load_example" type="button" class="secondary"><span aria-hidden="true">↗</span> Load fictional example</button></div>
-      <div class="inputs">
-        <section class="input-card" aria-labelledby="resume-heading">
-          <div class="card-heading"><span class="step-number">01</span><div><h3 id="resume-heading">Your experience</h3><p>Start with the story you already have.</p></div><span class="card-symbol" aria-hidden="true">↥</span></div>
-          <div class="upload-zone"><span class="upload-icon" aria-hidden="true">↥</span><label for="resume-file">Upload your resume</label><p>PDF or Word .docx · up to 5 MB</p><input id="resume-file" data-analytics-action="choose_file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="upload-help upload-status"></div>
-          <p id="upload-help" class="note">PDFs up to 20 pages. Scanned PDFs and older .doc files are not supported.</p><p id="upload-status" role="status" aria-live="polite"></p>
-          <div class="field-heading"><label for="resume">Or paste your resume</label><span>Editable preview</span></div>
-          <textarea id="resume" required minlength="30" maxlength="20000" placeholder="Your experience goes here… Upload a document or paste your resume text."></textarea>
-          <p class="field-hint">Uploaded text appears here. Review it before analyzing.</p>
-        </section>
-        <section class="input-card" aria-labelledby="job-heading">
-          <div class="card-heading"><span class="step-number">02</span><div><h3 id="job-heading">Your next opportunity</h3><p>Give your experience a direction.</p></div><span class="card-symbol" aria-hidden="true">↗</span></div>
-          <label for="job">The job description</label>
-          <textarea id="job" required minlength="30" maxlength="20000" placeholder="Paste the specific job description here, including responsibilities and qualifications…"></textarea>
-          <div class="tip"><span aria-hidden="true">✦</span><p><strong>A little context goes a long way.</strong><br>Use the full job description to connect your experience to the role.</p></div>
-        </section>
-      </div>
-      <details class="input-card linkedin-section">
-        <summary>Additional experience from LinkedIn · optional</summary>
-        <p class="note" id="linkedin-help">Upload your LinkedIn profile PDF or paste your About and Experience sections. In AI mode, ResumeIQ looks for job-relevant evidence missing from your resume. It analyzes only what you provide; it does not open LinkedIn or verify profile claims. PDF limits: 5 MB, 20 pages.</p>
-        <label for="linkedin-file">Upload a LinkedIn profile PDF</label>
-        <input id="linkedin-file" type="file" accept=".pdf,application/pdf" aria-describedby="linkedin-help linkedin-status">
-        <p id="linkedin-status" role="status" aria-live="polite"></p>
-        <label for="linkedin-text">Or paste LinkedIn profile text</label>
-        <textarea id="linkedin-text" maxlength="20000" aria-describedby="linkedin-help" placeholder="Optional: paste your About, Experience, or project descriptions. Review uploaded text here before analyzing."></textarea>
-        <p class="field-hint">Clear this field to leave LinkedIn out of the review. LinkedIn comparison is available in AI mode only.</p>
-      </details>
-      <div class="review-settings"><div class="toolbar"><label for="mode">Review mode</label><select id="mode"><option value="ai">AI analysis · OpenRouter</option><option value="local">Non-AI keyword comparison</option></select></div><p id="configuration" class="note">Checking AI configuration…</p></div>
-      <div class="action-bar"><p class="privacy-note"><span aria-hidden="true">◇</span><span>AI mode sends your resume, job description, and any supplied LinkedIn text to OpenRouter and its model provider. Remove personal details first. This app does not save your inputs. When configured, PostHog records pageviews, selected clicks, and session replays with document inputs and results blocked. Non-AI mode stays on your computer.</span></p><button id="analyze" data-analytics-action="analyze_resume" type="submit">Analyze my resume <span aria-hidden="true">↗</span></button></div>
-      <p id="status" role="status" aria-live="polite"></p>
-    </form>
-    <section id="results" hidden aria-labelledby="results-heading"><div class="result-heading"><span class="eyebrow">YOUR NEXT MOVES</span><h2 id="results-heading">Your application, in focus</h2><p id="result-label" class="note"></p></div><div class="results-grid"><article class="strength-card"><span class="result-icon" aria-hidden="true">✦</span><h3>Strengths</h3><ul id="strengths"></ul></article><article class="evidence-card"><span class="result-icon" aria-hidden="true">◎</span><h3>Missing evidence</h3><ul id="missing_evidence"></ul></article><article class="improvement-card"><span class="result-icon" aria-hidden="true">↗</span><h3>Three next moves</h3><ol id="improvements"></ol></article></div><article id="linkedin-results" class="input-card linkedin-section" hidden><h3>Relevant LinkedIn experience missing from your resume</h3><ul id="linkedin-opportunities"></ul><p class="note">Based only on the LinkedIn text you supplied. Confirm each claim before adding it to your resume.</p></article><p class="note results-note">Review every suggestion. Missing evidence is not missing ability. Only add claims you can support.</p></section>
-  </main>
+  <a class="skip-link" href="#workspace">Skip to workspace</a>
+  <aside class="sidebar" aria-label="Workspace sidebar">
+    <a class="brand" href="/" aria-label="ResumeIQ home"><span class="brand-mark" aria-hidden="true">R<span>✦</span></span>Resume<span class="brand-iq">IQ</span></a>
+    <nav aria-label="Main navigation"><a id="workspace-nav" class="nav-link active" href="#workspace" aria-current="page">Workspace</a><a id="saved-resumes-nav" class="nav-link" href="#saved-resumes">Saved resumes</a></nav>
+    <div class="sidebar-note"><p>One role. One focused review.</p><p>Resumes you choose to save stay in this browser.</p></div>
+  </aside>
+  <div class="app-shell">
+    <header class="app-bar"><span>Workspace <span class="breadcrumb-separator" aria-hidden="true">/</span> <span id="current-view-label" class="breadcrumb-current">New review</span></span><span class="environment-label">Local workspace</span></header>
+    <main id="workspace" tabindex="-1">
+      <section id="workspace-view" aria-label="Resume workspace">
+      <header class="workspace-header"><div><h1>Tailor your resume</h1><p>Start with your experience and a job posting.</p></div><button id="sample" type="button" class="secondary" data-analytics-action="load_example">Load fictional example</button></header>
+      <form id="review-form" aria-busy="false">
+        <div class="inputs">
+          <section class="panel resume-panel" aria-labelledby="resume-heading">
+            <header class="panel-heading"><h2 id="resume-heading">Your resume</h2><p>Upload a document or paste your resume text.</p></header>
+            <div class="upload-zone"><label for="resume-file">Upload PDF or DOCX</label><input id="resume-file" type="file" data-analytics-action="choose_file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="upload-help upload-status"><p id="upload-help" class="field-hint">PDF or Word .docx · up to 5 MB. PDFs: 20 pages maximum.</p></div>
+            <p id="upload-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+            <details id="resume-editor" class="resume-editor">
+              <summary>Paste or review resume text</summary>
+              <div class="resume-editor-content"><div class="field-heading"><label for="resume">Resume text</label><span>Editable</span></div>
+                <textarea id="resume" required minlength="30" maxlength="20000" aria-describedby="resume-help" placeholder="Paste your resume here, or upload a file above."></textarea>
+                <p id="resume-help" class="field-hint">Check extracted text before analyzing. Scanned and password-protected PDFs need a text-based copy.</p>
+              </div>
+            </details>
+            <div class="save-resume-row"><button id="save-resume" type="button" class="secondary">Save resume</button><span>Save the current text in this browser.</span></div>
+            <p id="save-resume-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+          </section>
+          <section class="panel job-panel" aria-labelledby="job-heading">
+            <header class="panel-heading"><h2 id="job-heading">Target role</h2><p>Paste a job description or enter a job posting URL.</p></header>
+            <label for="job-url">Job posting URL <span class="optional">Optional</span></label>
+            <div class="job-link-row"><input id="job-url" type="url" maxlength="2048" placeholder="https://company.com/careers/role" aria-describedby="job-link-help job-link-status"><button id="load-job" type="button" class="secondary" data-analytics-action="import_job_link">Import job</button></div>
+            <p id="job-link-help" class="field-hint">Public pages only. If a site blocks imports, paste the description below.</p>
+            <p id="job-link-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div class="field-heading"><label for="job">Description text</label><span>Editable</span></div>
+            <textarea id="job" required minlength="30" maxlength="20000" aria-describedby="job-help" placeholder="Paste the role’s responsibilities, requirements, and qualifications."></textarea>
+            <p id="job-help" class="field-hint">Review imported text and remove unrelated page content.</p>
+          </section>
+        </div>
+        <details class="panel linkedin-section">
+          <summary>Additional LinkedIn experience <span class="optional">Optional</span></summary>
+          <div class="details-content"><p class="note" id="linkedin-help">Add profile text or a profile PDF to find relevant experience missing from your resume. AI mode analyzes only what you provide; it does not visit LinkedIn or verify claims.</p>
+            <div class="linkedin-fields"><div><label for="linkedin-file">Profile PDF</label><input id="linkedin-file" type="file" accept=".pdf,application/pdf" aria-describedby="linkedin-help linkedin-file-help linkedin-status"><p id="linkedin-file-help" class="field-hint">Up to 5 MB and 20 pages.</p><p id="linkedin-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p></div><div><label for="linkedin-text">Profile text</label><textarea id="linkedin-text" maxlength="20000" aria-describedby="linkedin-help" placeholder="Paste your About, Experience, or project descriptions."></textarea><p class="field-hint">Review extracted text here. Clear it to leave LinkedIn out of the review.</p></div></div>
+          </div>
+        </details>
+        <div class="review-controls"><div class="review-mode"><label for="mode">Review mode</label><select id="mode"><option value="ai">AI analysis · OpenRouter</option><option value="local">Non-AI keyword comparison</option></select></div><button id="analyze" type="submit" class="primary" data-analytics-action="analyze_resume">Analyze my resume</button></div>
+        <p id="configuration" class="configuration" role="status">Checking AI availability…</p>
+        <p id="status" class="feedback review-feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+        <details class="privacy-details"><summary>How your information is used</summary><p>AI mode sends your resume, job description, and optional LinkedIn text to OpenRouter and its model provider. Remove personal details first. ResumeIQ does not save inputs on its server. Choosing Save resume stores only the current resume text and its name in this browser’s local storage. Saved resumes are not encrypted or synced; anyone with access to this browser profile can open them. Job descriptions, LinkedIn text, and original files are not saved. Delete saved resumes from the library; clearing this site’s browser data also removes them. A job-link import sends a request to the posting website, without your resume or profile text. Non-AI comparison runs locally.</p><p>PostHog records pageviews, selected clicks, and session replay. Document inputs, URLs, saved resume content and names, and generated results are blocked from replay; custom events contain no document content.</p></details>
+      </form>
+      <section id="results" hidden aria-labelledby="results-heading">
+        <header class="results-header"><div><h2 id="results-heading">Your review</h2><p>Use the suggestions below to edit your resume. Confirm every claim.</p></div><p id="result-label" class="result-source"></p></header>
+        <div class="results-layout"><article class="panel improvement-card"><header class="panel-heading"><h3>Three improvements</h3><p>Prioritize these edits for this role.</p></header><ol id="improvements"></ol></article><div class="evidence-stack"><article class="panel strength-card"><header class="panel-heading"><h3>Strengths</h3></header><ul id="strengths"></ul></article><article class="panel evidence-card"><header class="panel-heading"><h3>Missing evidence</h3></header><ul id="missing_evidence"></ul></article></div></div>
+        <article id="linkedin-results" class="panel linkedin-results" hidden><header class="panel-heading"><h3>Additional LinkedIn evidence</h3><p>Relevant profile experience that may be missing from your resume.</p></header><ul id="linkedin-opportunities"></ul><p class="field-hint">Based only on the profile text you supplied. Confirm each claim before using it.</p></article>
+        <p class="results-note">Missing evidence does not mean missing ability. Only add experience and metrics you can support.</p>
+      </section>
+      </section>
+      <section id="saved-resumes-view" hidden aria-labelledby="saved-resumes-heading">
+        <header class="workspace-header"><div><h1 id="saved-resumes-heading" tabindex="-1">Saved resumes</h1><p>Your resume text, ready to reuse.</p></div><a class="button-link secondary" href="#workspace">Back to workspace</a></header>
+        <p class="library-note">Stored only in this browser on this device. Clearing this site’s browser data removes these saves. Original PDF and Word files are not stored.</p>
+        <p id="library-status" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+        <div id="library-empty" class="panel library-empty"><h2>No saved resumes yet</h2><p>Upload or paste a resume in the workspace, then choose Save resume.</p><a class="button-link secondary" href="#workspace">Go to workspace</a></div>
+        <ul id="saved-resumes-list" class="saved-resumes-list" aria-label="Saved resume library"></ul>
+      </section>
+    </main>
+  </div>
+  <dialog id="resume-name-dialog" aria-labelledby="resume-name-title" aria-describedby="resume-name-help">
+    <form id="resume-name-form"><h2 id="resume-name-title">Save resume</h2><p id="resume-name-help" class="note">Only the current resume text and this name are saved in this browser. Original files, job descriptions, and LinkedIn text are not saved.</p><label for="resume-name">Resume name</label><input id="resume-name" type="text" required maxlength="80" autocomplete="off" placeholder="For example, Product manager resume"><p id="resume-name-status" class="feedback" role="status" aria-live="polite"></p><div class="dialog-actions"><button id="resume-name-cancel" type="button" class="secondary">Cancel</button><button id="resume-name-submit" type="submit" class="primary">Save resume</button></div></form>
+  </dialog>
+  <dialog id="resume-confirm-dialog" aria-labelledby="resume-confirm-title" aria-describedby="resume-confirm-text"><h2 id="resume-confirm-title"></h2><p id="resume-confirm-text"></p><div class="dialog-actions"><button id="resume-confirm-cancel" type="button" class="secondary">Cancel</button><button id="resume-confirm-action" type="button" class="primary">Confirm</button></div></dialog>
 </body>
 </html>

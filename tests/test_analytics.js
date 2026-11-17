@@ -37,7 +37,7 @@ for (const surface of ['product_page', 'local_app']) {
   assert.equal(run.options.session_recording.recordBody, false);
   assert.equal(run.options.session_recording.recordHeaders, false);
   assert.equal(run.options.session_recording.maskCapturedNetworkRequestFn({body: 'private'}), null);
-  for (const id of ['resume', 'job', 'resume-file', 'linkedin-text', 'linkedin-file', 'linkedin-status', 'results', 'upload-status', 'status', 'configuration']) {
+  for (const id of ['resume', 'save-resume-status', 'saved-resumes-view', 'resume-name-dialog', 'resume-confirm-dialog', 'job', 'job-url', 'job-link-status', 'resume-file', 'linkedin-text', 'linkedin-file', 'linkedin-status', 'results', 'upload-status', 'status', 'configuration']) {
     assert.ok(run.options.session_recording.blockSelector.split(', ').includes('#' + id));
   }
   run.listeners.click({target: {closest: () => ({dataset: {analyticsAction: 'analyze_resume'}, textContent: 'PRIVATE RESUME'})}});
